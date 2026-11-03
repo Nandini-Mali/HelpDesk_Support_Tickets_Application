@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.nexora.helpdesk.enums.Priority;
 import com.nexora.helpdesk.enums.TicketStatus;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,16 +24,22 @@ public class Ticket {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column(nullable=false)
 	private String title;
+	
+	@Column(length=2000)
 	private String description;
+	
 	private String category;
 	
 	@Enumerated(EnumType.STRING)
 	private Priority priority;
+	@Enumerated(EnumType.STRING)
 	private TicketStatus status;
 	
 	@ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by",nullable=false)
 	private User createdBy;
 	
 	private LocalDateTime createdAt;
