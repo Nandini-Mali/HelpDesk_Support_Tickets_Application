@@ -5,15 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
-	@NotBlank
+	@NotBlank(message="Name is required")
 	@Size(min=2,max=100)
 	private String name;
 	
-	@NotBlank
-	@Email
+	@NotBlank(message="Email is required")
+	@Email(message="Enterr a valid email")
 	private String email;
 	
-	@NotBlank
+	@NotBlank(message="Password is required")
 	@Size(min=8,max=100)
 	private String password;
 	
@@ -21,7 +21,9 @@ public class RegisterRequest {
 		
 	}
 
-	public RegisterRequest(String name, String email, String password) {
+	public RegisterRequest(@NotBlank(message = "Name is required") @Size(min = 2, max = 100) String name,
+			@NotBlank(message = "Email is required") @Email(message = "Enterr a valid email") String email,
+			@NotBlank(message = "Password is required") @Size(min = 8, max = 100) String password) {
 		super();
 		this.name = name;
 		this.email = email;
