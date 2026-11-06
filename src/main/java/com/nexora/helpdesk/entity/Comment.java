@@ -28,20 +28,20 @@ public class Comment {
 	
 	@Column(nullable=false,length=2000)
 	private String message;
-	private LocalDateTime creatdetAt;
+	private LocalDateTime createdAt;
 	
 	public Comment() {
 		
 	}
 	
 
-	public Comment(Long id, Ticket ticket, User author, String message, LocalDateTime creatdetAt) {
+	public Comment(Long id, Ticket ticket, User author, String message, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.ticket = ticket;
 		this.author = author;
 		this.message = message;
-		this.creatdetAt = creatdetAt;
+		this.createdAt = createdAt;
 	}
 
 
@@ -77,12 +77,12 @@ public class Comment {
 		this.message = message;
 	}
 
-	public LocalDateTime getCreatdetAt() {
-		return creatdetAt;
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreatdetAt(LocalDateTime creatdetAt) {
-		this.creatdetAt = creatdetAt;
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt =createdAt;
 	}
 
 }
