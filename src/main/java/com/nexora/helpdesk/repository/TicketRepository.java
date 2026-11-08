@@ -13,7 +13,7 @@ import com.nexora.helpdesk.enums.Priority;
 import com.nexora.helpdesk.enums.TicketStatus;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket,Long> {
-
+	boolean existsByCreatedById(Long userId);
 	List<Ticket> findByCreatedBy(User user);
 	List<Ticket> findByStatus(TicketStatus status);
     List<Ticket> findByPriority(Priority priority);

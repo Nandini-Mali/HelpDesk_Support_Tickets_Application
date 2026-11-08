@@ -51,9 +51,9 @@ public class TicketController {
     return ResponseEntity.ok(response);
 }
 //Get tickets by user
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<List<TicketResponse>> getTicketsByUser(@PathVariable Long userId,@RequestParam Long requesterId) {
-    List<TicketResponse> tickets=ticketService.getTicketsByUser(userId, requesterId);
+  @GetMapping("/user/{targetUserId}")
+  public ResponseEntity<List<TicketResponse>> getTicketsByUser(@PathVariable Long targetUserId,@RequestParam Long requesterId) {
+    List<TicketResponse> tickets=ticketService.getTicketsByUser(targetUserId, requesterId);
     return ResponseEntity.ok(tickets);
 }
 

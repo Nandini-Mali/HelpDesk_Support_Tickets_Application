@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,12 +27,16 @@ public class Comment {
 	@JoinColumn(name="author_id",nullable=false)
 	private User author;
 	
-	@Column(nullable=false,length=2000)
+	@Column(nullable=false,length=1000)
 	private String message;
 	private LocalDateTime createdAt;
 	
 	public Comment() {
 		
+	}
+	@PrePersist
+	protected void onCreate() {
+	    createdAt = LocalDateTime.now();
 	}
 	
 

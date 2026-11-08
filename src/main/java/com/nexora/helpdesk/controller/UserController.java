@@ -1,18 +1,18 @@
 package com.nexora.helpdesk.controller;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nexora.helpdesk.dto.RegisterRequest;
+
 import com.nexora.helpdesk.dto.UpdateUserRequest;
 import com.nexora.helpdesk.dto.UserResponse;
 
@@ -27,18 +27,7 @@ public class UserController {
   public UserController(UserService userService) {
 	  this.userService=userService;
   }
-  
-  //Register user
-  @PostMapping("/register")
-  public ResponseEntity<UserResponse> registerUser(
-         @Valid @RequestBody RegisterRequest request) {
-
-      UserResponse response = userService.registerUser(request);
-
-      return new ResponseEntity<>(response, HttpStatus.CREATED);
-  }
-  
-  //Get User By Id
+//Get User By Id
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
 
@@ -47,7 +36,7 @@ public class UserController {
       return ResponseEntity.ok(response);
   }
   
-  //Get User By Email
+//Get User By Email
   @GetMapping("/email/{email}")
   public ResponseEntity<UserResponse> getUserByEmail(
           @PathVariable String email) {
@@ -75,12 +64,13 @@ public class UserController {
       return ResponseEntity.ok(response);
   } 
  //Delete user
-@DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteUser(
+          @PathVariable Long id) {
 
       userService.deleteUser(id);
 
-      return ResponseEntity.ok("User deleted successfully!");
+      return ResponseEntity.noContent().build();
   }
 	
 }

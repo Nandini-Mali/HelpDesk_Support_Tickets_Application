@@ -9,7 +9,7 @@ public class TicketResponse {
 
 	private Long id;
 	private String title;
-	private String description;;
+	private String description;
 	private String category;
 	private Priority priority;
 	private TicketStatus status;

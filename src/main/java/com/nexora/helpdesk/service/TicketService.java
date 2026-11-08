@@ -18,6 +18,8 @@ import com.nexora.helpdesk.entity.User;
 import com.nexora.helpdesk.enums.Priority;
 import com.nexora.helpdesk.enums.Role;
 import com.nexora.helpdesk.enums.TicketStatus;
+import com.nexora.helpdesk.exception.InvalidStatusTransitionException;
+import com.nexora.helpdesk.exception.ResourceNotFoundException;
 import com.nexora.helpdesk.repository.TicketHistoryRepository;
 import com.nexora.helpdesk.repository.TicketRepository;
 import com.nexora.helpdesk.repository.UserRepository;
@@ -42,24 +44,30 @@ public class TicketService {
     	if (request == null) {
             throw new IllegalArgumentException("Ticket request cannot be null");
         }
+    	if(request.getTitle() == null || request.getTitle().isBlank()
+    	        || request.getDescription() == null || request.getDescription().isBlank()
+    	        || request.getCategory() == null || request.getCategory().isBlank()
+    	        || request.getPriority() == null) {
+
+    	    throw new IllegalArgumentException("Title, description, category and priority are required");
+    	}
     	User user=getUserById(userId);
-		Ticket ticket=new Ticket();		
+    	
+    	Ticket ticket=new Ticket();		
 			
-	    ticket.setTitle(request.getTitle());
-	    ticket.setDescription(request.getDescription());
-	    ticket.setCategory(request.getCategory());
+	    ticket.setTitle(request.getTitle().trim());
+	    ticket.setDescription(request.getDescription().trim());
+	    ticket.setCategory(request.getCategory().trim());
 		ticket.setPriority(request.getPriority());
 		ticket.setStatus(TicketStatus.OPEN);
 		ticket.setCreatedBy(user);
-		ticket.setCreatedAt(LocalDateTime.now());
-		Ticket savedTicket=ticketRepository.save(ticket);
-	    saveHistory(savedTicket, user, "STATUS",
-	                null, TicketStatus.OPEN.name());
+        Ticket savedTicket=ticketRepository.save(ticket);
+	    saveHistory(savedTicket, user, "STATUS",null, TicketStatus.OPEN.name());
 		
 	    return convertToTicketResponse(savedTicket);
 	}
   
- //Get all tickets based on role
+//Get all tickets based on role
     @Transactional(readOnly = true)
     public List<TicketResponse> getAllTickets(Long userId) {
 
@@ -87,8 +95,8 @@ public class TicketService {
     public List<TicketResponse> getTicketsByUser(Long targetUserId, Long requesterId) {
 
     	User requester = getUserById(requesterId);
-        User targetUser = getUserById(targetUserId);
-
+    	User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + targetUserId));
         boolean isAgent = requester.getRole() == Role.AGENT;
         boolean isOwner = requester.getId().equals(targetUserId);
 
@@ -100,7 +108,7 @@ public class TicketService {
           .stream().map(this::convertToTicketResponse).collect(Collectors.toList());
     }
 	
-    //Update ticket status
+//Update ticket status
     public TicketResponse updateTicketStatus(Long ticketId, TicketStatus status, Long userId) {
 
         if (status == null) {
@@ -148,8 +156,7 @@ public class TicketService {
         User user = getUserById(userId);
 
         if (user.getRole() != Role.AGENT) {
-            throw new AccessDeniedException(
-                    "Only AGENT can update ticket priority");
+            throw new AccessDeniedException("Only AGENT can update ticket priority");
         }
 
         Priority oldPriority = ticket.getPriority();
@@ -161,8 +168,7 @@ public class TicketService {
         ticket.setPriority(priority);
         Ticket updatedTicket = ticketRepository.save(ticket);
 
-        saveHistory(updatedTicket, user,
-                "PRIORITY", oldPriority.name(), priority.name());
+        saveHistory(updatedTicket, user,"PRIORITY", oldPriority.name(), priority.name());
 
         return convertToTicketResponse(updatedTicket);
     }
@@ -185,8 +191,7 @@ public class TicketService {
     public List<TicketResponse> getTicketsByPriority(
             Priority priority, Long userId) {
     	if (priority == null) {
-            throw new IllegalArgumentException(
-                    "Ticket priority cannot be null");
+            throw new IllegalArgumentException("Ticket priority cannot be null");
         }
     	User user = getUserById(userId);
         List<Ticket> tickets = ticketRepository.findByPriority(priority);
@@ -213,34 +218,37 @@ public class TicketService {
     }
     
 // Find ticket by ID internally
-    @Transactional(readOnly = true)
+   
     private Ticket findTicketById(Long ticketId) {
         return ticketRepository.findById(ticketId)
-            .orElseThrow(() -> new RuntimeException("Ticket not found with ID: " + ticketId));
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with ID: " + ticketId));
     }
     
 // Find user by ID internally
-    @Transactional(readOnly = true)
+    
     private User getUserById(Long userId) {
 
-        return userRepository.findById(userId)
-                .orElseThrow(() ->new RuntimeException("User not found with ID: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!user.isActive()) {
+            throw new ResourceNotFoundException("User is inactive");
+        }
+
+        return user;
     }
   //check whether user is allowed to access ticket
-    public void checkTicketAccess(
+    private void checkTicketAccess(
             Ticket ticket, Long userId) {
 
         User user = getUserById(userId);
 
-        boolean isOwner =
-                ticket.getCreatedBy().getId().equals(userId);
+        boolean isOwner =ticket.getCreatedBy().getId().equals(userId);
 
-        boolean isAgent =
-                user.getRole() == Role.AGENT;
+        boolean isAgent =user.getRole() == Role.AGENT;
 
         if (!isOwner && !isAgent) {
-            throw new AccessDeniedException(
-                    "You are not allowed to access this ticket");
+            throw new AccessDeniedException("You are not allowed to access this ticket");
         }
     }
  // Validate status transitions
@@ -255,17 +263,11 @@ public class TicketService {
             return;
         }
 
-        boolean validTransition =
-                (oldStatus == TicketStatus.OPEN
-                        && newStatus == TicketStatus.IN_PROGRESS)
-                ||
-                (oldStatus == TicketStatus.IN_PROGRESS
-                        && newStatus == TicketStatus.CLOSED);
+        boolean validTransition =(oldStatus == TicketStatus.OPEN && newStatus == TicketStatus.IN_PROGRESS)
+                              || (oldStatus == TicketStatus.IN_PROGRESS&& newStatus == TicketStatus.CLOSED);
 
         if (!validTransition) {
-            throw new IllegalStateException(
-                    "Invalid status transition from "
-                    + oldStatus + " to " + newStatus);
+        	throw new InvalidStatusTransitionException("Invalid status transition from " + oldStatus + " to " + newStatus);       
         }
     }
  //Filter tickets according to user role

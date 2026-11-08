@@ -1,6 +1,5 @@
 package com.nexora.helpdesk.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,70 +34,113 @@ public class CommentService {
 
 //Add Comment
 	public CommentResponse addComment(Long ticketId,Long userId,CommentRequest request) {
-		if (request == null) {
-	        throw new IllegalArgumentException("Comment request cannot be null");
-	    }
-		Ticket ticket=ticketRepository.findById(ticketId)
-		  .orElseThrow(()->new ResourceNotFoundException("Ticket not found"));
-	
-	   User user=userRepository.findById(userId)
-			   .orElseThrow(()->new ResourceNotFoundException("User not found"));
-	  
-	   if (user.getRole() == Role.USER) {
-            if (!ticket.getCreatedBy().getId().equals(user.getId())) {
-               throw new AccessDeniedException("You can comment only on your own ticket");
-           }
-      } else if (user.getRole() != Role.AGENT) {
-    	  throw new AccessDeniedException("You are not authorized to add comments");
-       }
+		if (request == null ||
+            request.getMessage() == null ||request.getMessage().isBlank()) {
 
+            throw new IllegalArgumentException("Comment message is required");
+        }
+
+		User user = getActiveUserById(userId);
+
+        Ticket ticket = findTicketById(ticketId);
+
+        checkTicketAccess(ticket, user);
+
+	    Comment comment=new Comment();
+	    comment.setMessage(request.getMessage().trim());
+	    comment.setTicket(ticket);
+	    comment.setAuthor(user);
 	   
-	   Comment comment=new Comment();
-	   comment.setMessage(request.getMessage());
-	   comment.setTicket(ticket);
-	   comment.setAuthor(user);
-	   comment.setCreatedAt(LocalDateTime.now());
+	    Comment savedComment=commentRepository.save(comment);
 	   
-	   Comment savedComment=commentRepository.save(comment);
-	   
-	   return convertToResponse(savedComment);
+	    return convertToResponse(savedComment);
 	}
 
-//Get All comments By ticket Id
-@Transactional(readOnly = true)
-public List<CommentResponse> getCommentsByTicketId(Long ticketId){
-	 if (!ticketRepository.existsById(ticketId)) {
-         throw new ResourceNotFoundException("Ticket not found");
-     }
-	 return commentRepository.findByTicketId(ticketId)
-		.stream().map(this::convertToResponse).collect(Collectors.toList());
-}
+//Get all comments by ticket ID
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getCommentsByTicketId(Long ticketId, Long userId) {
 
-//Get Comment By Id
-@Transactional(readOnly = true)
-  public CommentResponse getCommentById(Long commentId) {
-	  Comment comment = commentRepository.findById(commentId)
-          .orElseThrow(() ->new ResourceNotFoundException("Comment not found"));
+        User user = getActiveUserById(userId);
 
-      return convertToResponse(comment);
-  }
+        Ticket ticket = findTicketById(ticketId);
 
-//Delete Comment
-  public void deleteComment(Long commentId,Long userId) {
-      Comment comment = commentRepository.findById(commentId)
-              .orElseThrow(()->new ResourceNotFoundException("Comment not found"));
-      User user=userRepository.findById(userId)
-              .orElseThrow(() ->new ResourceNotFoundException("User not found"));
-      if (user.getRole()== Role.USER) {
-           if (!comment.getAuthor().getId().equals(user.getId())) {
-              throw new AccessDeniedException("You can delete only your own comment");
-          }
-      }else if (user.getRole() != Role.AGENT) {
-          throw new AccessDeniedException("You are not authorized to delete comments");
-      }
-      
-      commentRepository.delete(comment);
-  } 
+        checkTicketAccess(ticket, user);
+
+        return commentRepository.findByTicketId(ticketId)
+           .stream().map(this::convertToResponse).collect(Collectors.toList());
+    }
+
+ //Get comment by ID
+    @Transactional(readOnly = true)
+    public CommentResponse getCommentById(Long commentId, Long userId) {
+
+        User user = getActiveUserById(userId);
+
+        Comment comment = findCommentById(commentId);
+
+        checkTicketAccess(comment.getTicket(), user);
+
+        return convertToResponse(comment);
+    }
+
+ //Delete comment
+    public void deleteComment(Long commentId, Long userId) {
+
+        User user = getActiveUserById(userId);
+
+        Comment comment = findCommentById(commentId);
+
+        if (user.getRole() == Role.USER) {
+
+            if (!comment.getAuthor().getId().equals(user.getId())) {
+
+                throw new AccessDeniedException("You can delete only your own comments");
+            }
+
+        } else if (user.getRole() != Role.AGENT) {
+
+            throw new AccessDeniedException("You are not authorized to delete comments");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+// Find comment by ID
+    private Comment findCommentById(Long commentId) {
+
+        return commentRepository.findById(commentId)
+                .orElseThrow(() ->new ResourceNotFoundException("Comment not found with ID: " + commentId));
+    }
+ // Find ticket by ID
+    private Ticket findTicketById(Long ticketId) {
+
+        return ticketRepository.findById(ticketId)
+                .orElseThrow(() ->new ResourceNotFoundException("Ticket not found with ID: " + ticketId));
+    }
+ // Find active user by ID
+    private User getActiveUserById(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!user.isActive()) {
+            throw new ResourceNotFoundException("User is inactive");
+        }
+
+        return user;
+    }
+ // Check ticket access
+    private void checkTicketAccess(Ticket ticket, User user) {
+
+        boolean isOwner = ticket.getCreatedBy().getId().equals(user.getId());
+
+        boolean isAgent = user.getRole() == Role.AGENT;
+
+        if (!isOwner && !isAgent) {
+
+            throw new AccessDeniedException("You are not allowed to access this ticket");
+        }
+    }
 //Convert Entity To Response DTO
   private CommentResponse convertToResponse(Comment comment) {
 

@@ -25,17 +25,21 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable=false)
+	@Column(nullable=false,length=150)
 	private String title;
 	
-	@Column(length=2000)
-	private String description;
+	@Column(length=2000,nullable=false)
+    private String description;
 	
+	@Column(nullable=false,length=100)
 	private String category;
 	
 	@Enumerated(EnumType.STRING)
+	@Column(nullable=false)
 	private Priority priority;
+	
 	@Enumerated(EnumType.STRING)
+	@Column(nullable=false)
 	private TicketStatus status;
 	
 	@ManyToOne
