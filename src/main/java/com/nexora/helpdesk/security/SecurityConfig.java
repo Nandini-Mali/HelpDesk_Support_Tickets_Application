@@ -70,7 +70,20 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // Public APIs
+            		.requestMatchers(
+            			    "/",
+            			    "/index.html",
+            			    "/register.html",
+            			    "/user-dashboard.html",
+            			    "/agent-dashboard.html",
+            			    "/create-ticket.html",
+            			    "/my-tickets.html",
+            			    "/ticket-details.html",
+            			    "/css/**",
+            			    "/js/**"
+            			).permitAll()
+                
+            		// Public APIs
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/auth/register",

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h2>HelpDesk Portal</h2>
+        <a href="user-dashboard.html">Dashboard</a>
+        <a href="my-tickets.html">My Tickets</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Ticket Details</h2>
+        </header>
+
+        <section class="panel">
+            <h3 id="detailTitle">Ticket Information</h3>
+
+            <p><strong>Ticket ID:</strong> <span id="detailId"></span></p>
+            <p><strong>Description:</strong> <span id="detailDescription"></span></p>
+            <p><strong>Category:</strong> <span id="detailCategory"></span></p>
+            <p><strong>User:</strong> <span id="detailUser"></span></p>
+            <p><strong>Priority:</strong> <span id="detailPriority"></span></p>
+            <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+
+            <div id="agentControls" hidden>
+                <label>Update Status</label>
+                <select id="newStatus">
+                    <option value="OPEN">Open</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="CLOSED">Closed</option>
+                </select>
+
+                <label>Update Priority</label>
+                <select id="newPriority">
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    
+                </select>
+
+                <button class="btn" onclick="updateTicket()">
+                    Update Ticket
+                </button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h3>Comments</h3>
+            <div id="commentsList"></div>
+
+            <form id="commentForm">
+                <label>Add Comment</label>
+                <textarea id="commentText" rows="3" required></textarea>
+                <button class="btn" type="submit">Post Comment</button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>Ticket History</h3>
+            <div id="historyList"></div>
+        </section>
+
+        <p id="message" class="message"></p>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/tickets.js"></script>
+</body>
+</html>

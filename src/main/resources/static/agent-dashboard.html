@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <h2>HelpDesk Portal</h2>
+
+        <a class="active" href="agent-dashboard.html">Dashboard</a>
+        <a href="my-tickets.html">All Tickets</a>
+        <a href="ticket-details.html">Comments</a>
+        <a href="ticket-details.html">Ticket History</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Agent Dashboard</h2>
+                <p class="subtitle">
+                  Manage support requests and provide effective solutions to users.
+                </p>
+            </div>
+
+            <span id="welcome">Welcome Agent</span>
+        </header>
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <h3>Total Tickets</h3>
+                <p id="totalTickets">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Open Tickets</h3>
+                <p id="openTickets">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>In Progress</h3>
+                <p id="progressTickets">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Closed Tickets</h3>
+                <p id="closedTickets">0</p>
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <h3>All Support Tickets</h3>
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>User</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="recentTickets">
+                    </tbody>
+
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

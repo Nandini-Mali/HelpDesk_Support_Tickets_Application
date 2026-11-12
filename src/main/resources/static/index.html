@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Desk - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+<div class="auth-card">
+    <h1>HelpDesk Portal</h1>
+    <p class="subtitle">Welcome Back! Sign in to manage your support tickets</p>
+
+    <form id="loginForm">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+        <span class="input-icon">✉</span>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="button"
+                class="toggle-password"
+                id="togglePassword">
+            Show
+        </button>
+        
+        </div>
+        <button type="submit" class="btn">Login</button>
+    </form>
+
+    <p id="message" class="message"></p>
+
+    <p class="auth-link">
+        Don't have an account?
+        <a href="register.html">Register</a>
+    </p>
+</div>
+<script src="js/auth.js"></script>
+</body>
+</html>

@@ -314,7 +314,7 @@ public class TicketService {
 		response.setStatus(ticket.getStatus());
 		response.setCreatedAt(ticket.getCreatedAt());
 		response.setClosedAt(ticket.getClosedAt());
-
+		response.setCreatedByName(ticket.getCreatedBy().getName());
 	    return response;
  }
 }

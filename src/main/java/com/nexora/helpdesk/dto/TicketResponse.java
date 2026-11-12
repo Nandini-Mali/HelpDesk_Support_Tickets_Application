@@ -15,13 +15,14 @@ public class TicketResponse {
 	private TicketStatus status;
 	private LocalDateTime createdAt;
 	private LocalDateTime closedAt;
+	private String createdByName;
 	
 	public TicketResponse() {
 		
 	}
 
 	public TicketResponse(Long id, String title, String description, String category, Priority priority,
-			TicketStatus status, LocalDateTime createdAt, LocalDateTime closedAt) {
+			TicketStatus status, LocalDateTime createdAt, LocalDateTime closedAt,String createdByName) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -31,6 +32,7 @@ public class TicketResponse {
 		this.status = status;
 		this.createdAt = createdAt;
 		this.closedAt = closedAt;
+		this.createdByName=createdByName;
 	}
 
 	public Long getId() {
@@ -96,5 +98,11 @@ public class TicketResponse {
 	public void setClosedAt(LocalDateTime closedAt) {
 		this.closedAt = closedAt;
 	}
-	
+	public String getCreatedByName() {
+	    return createdByName;
+	}
+
+	public void setCreatedByName(String createdByName) {
+	    this.createdByName = createdByName;
+	}
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h2>HelpDesk Portal</h2>
+        <a href="user-dashboard.html">Dashboard</a>
+        <a class="active" href="create-ticket.html">Create Ticket</a>
+        <a href="my-tickets.html">My Tickets</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Create New Ticket</h2>
+        </header>
+
+        <section class="panel form-panel">
+            <form id="ticketForm">
+                <label>Ticket Title</label>
+                <input type="text" id="title" required>
+
+                <label>Description</label>
+                <textarea id="description" rows="5" required></textarea>
+
+                <label>Category</label>
+                <select id="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Technical">Technical</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Software">Software</option>
+                    <option value="Network">Network</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label>Priority</label>
+                <select id="priority" required>
+                    <option value="">Select Priority</option>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                   
+                </select>
+
+                <button class="btn" type="submit">Submit Ticket</button>
+            </form>
+
+            <p id="message" class="message"></p>
+        </section>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/tickets.js"></script>
+</body>
+</html>

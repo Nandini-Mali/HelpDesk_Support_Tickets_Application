@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Desk - Register</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-card">
+    <h1>Create Your Account</h1>
+    <p class="subtitle">Join us to get support and manage your tickets easily</p>
+
+    <form id="registerForm">
+        <label>Full Name</label>
+        <input type="text" id="name" required>
+
+        <label>Email Address</label>
+        <input type="email" id="email" required>
+
+        <label>Password</label>
+        <input type="password" id="password" minlength="8" required>
+
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPassword" minlength="8" required>
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <p id="message" class="message"></p>
+
+    <p class="auth-link">
+        Already registered?
+        <a href="index.html">Login</a>
+    </p>
+</div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>
