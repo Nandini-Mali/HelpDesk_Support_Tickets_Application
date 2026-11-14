@@ -145,8 +145,6 @@ spring.jpa.show-sql=true
 
 Replace `YOUR_MYSQL_PASSWORD` with your local MySQL password.
 
-**Important:** Never upload your actual database password or other credentials to GitHub.
-
 ## How to Run the Project
 
 ### Prerequisites
