@@ -8,14 +8,15 @@ public class Ticket {
     private String priority;
     private String status;
     private String createdAt;
+    private String closedAt;
     private String createdByName;
 
    public Ticket(){
 	   
    }
 
-  public Ticket(Long id, String title, String description, String category, String priority, String status,
-		String createdAt, String createdByName) {
+public Ticket(Long id, String title, String description, String category, String priority, String status,
+		String createdAt, String closedAt, String createdByName) {
 	super();
 	this.id = id;
 	this.title = title;
@@ -24,34 +25,35 @@ public class Ticket {
 	this.priority = priority;
 	this.status = status;
 	this.createdAt = createdAt;
+	this.closedAt = closedAt;
 	this.createdByName = createdByName;
 }
 
- public Long getId() {
+public Long getId() {
 	return id;
-  }
+}
 
- public void setId(Long id) {
+public void setId(Long id) {
 	this.id = id;
 }
 
- public String getTitle() {
+public String getTitle() {
 	return title;
 }
 
- public void setTitle(String title) {
+public void setTitle(String title) {
 	this.title = title;
 }
 
- public String getDescription() {
+public String getDescription() {
 	return description;
 }
 
- public void setDescription(String description) {
+public void setDescription(String description) {
 	this.description = description;
 }
 
- public String getCategory() {
+public String getCategory() {
 	return category;
 }
 
@@ -83,6 +85,14 @@ public void setCreatedAt(String createdAt) {
 	this.createdAt = createdAt;
 }
 
+public String getClosedAt() {
+	return closedAt;
+}
+
+public void setClosedAt(String closedAt) {
+	this.closedAt = closedAt;
+}
+
 public String getCreatedByName() {
 	return createdByName;
 }
@@ -90,4 +100,7 @@ public String getCreatedByName() {
 public void setCreatedByName(String createdByName) {
 	this.createdByName = createdByName;
 }
+   
+   
 }
+ 

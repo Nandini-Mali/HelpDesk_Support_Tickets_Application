@@ -18,7 +18,7 @@ public class Main {
 	                e.printStackTrace();
 	            }
 
-	          
+	            new LoginFrame().setVisible(true);
 	        });
 	    }
 	}

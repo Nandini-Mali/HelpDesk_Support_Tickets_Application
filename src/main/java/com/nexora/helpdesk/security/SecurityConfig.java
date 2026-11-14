@@ -114,7 +114,7 @@ public class SecurityConfig {
 
                 // Comments
                 .requestMatchers("/api/comments/**")
-                    .hasAnyRole("USER", "AGENT")
+                .hasAnyRole("USER", "AGENT")
 
                 // Ticket History
                 .requestMatchers("/api/ticket-history/**")
