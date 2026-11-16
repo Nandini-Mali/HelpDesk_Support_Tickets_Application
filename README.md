@@ -188,7 +188,6 @@ spring.jpa.show-sql=false
 
 Configure `DB_USERNAME` and `DB_PASSWORD` as environment variables.
 
-**Security note:** Never upload database passwords or private credentials to GitHub.
 
 ## Installation and Setup
 
