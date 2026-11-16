@@ -1,284 +1,349 @@
-# Help Desk and Support Ticket Application
+# HelpDesk Support Ticket System
 
-## Project Overview
+A desktop-based HelpDesk Support Ticket System developed using Java Swing, Spring Boot, and MySQL. The application provides a centralized platform where users can create and track support tickets, while support agents can manage tickets, update their status and priority, and communicate through comments.
 
-The Help Desk and Support Ticket Application is a backend REST API developed using Spring Boot and MySQL. It helps users raise support tickets and allows agents to manage, track, and resolve those tickets.
-
-The application supports user management, ticket creation, comments, ticket history, authentication, and role-based authorization.
-
-## Objectives
-
-- Develop REST APIs using Spring Boot.
-- Manage users and support tickets.
-- Implement USER and AGENT roles.
-- Track ticket status and priority changes.
-- Maintain ticket history.
-- Handle exceptions with meaningful error messages.
-- Secure APIs using Spring Security.
-
-## Technologies Used
-
-| Technology | Purpose |
-|---|---|
-| Java 17 | Programming Language |
-| Spring Boot 4.0.0 | Backend Framework |
-| Spring Data JPA | Database Operations |
-| Hibernate | ORM |
-| MySQL | Database |
-| Spring Security | Authentication and Authorization |
-| Maven | Dependency Management |
-| Postman | API Testing |
-| Eclipse IDE | Development Environment |
-| Git & GitHub | Version Control |
+The system follows a client-server architecture, with a Java Swing desktop application communicating with a Spring Boot backend through REST APIs.
 
 ## Key Features
 
-### 1. User Management
-- User registration.
-- User login and credential verification.
-- Get user details by ID and email.
-- Update user information.
-- Soft delete user accounts.
-- Duplicate email validation.
+### 1. User Authentication
+
+- User registration and login.
+- Secure password storage using BCrypt.
+- Role-based access control.
+- USER and AGENT account roles.
+- Active and inactive account handling.
 
 ### 2. Ticket Management
+
 - Create support tickets.
-- Retrieve tickets.
-- View tickets based on user access.
-- Update ticket status.
-- Update ticket priority.
+- View ticket details.
+- View personal tickets.
 - Filter tickets by status and priority.
-- Support pagination.
+- Paginated ticket listing.
+- Update ticket status and priority.
+- Ticket ownership and access validation.
 
 ### 3. Comment Management
+
 - Add comments to tickets.
-- Retrieve comments.
-- View individual comments.
-- Manage comments based on user roles and access permissions.
+- View ticket comments.
+- Retrieve individual comments.
+- Delete comments with authorization checks.
 
 ### 4. Ticket History
+
 - Track ticket status changes.
 - Track priority changes.
 - Store previous and updated values.
-- Record who made the changes and when.
+- Record who performed each change.
+- View ticket history.
 
-### 5. Security
-- Spring Security configuration.
-- HTTP Basic Authentication.
+### 5. Application Security
+
+- Spring Security integration.
 - BCrypt password encoding.
-- Role-based authorization for USER and AGENT.
-- Protected REST API endpoints.
+- HTTP Basic authentication.
+- Role-based authorization.
+- Authenticated user identity verification.
+- Ticket and comment access validation.
+- Stateless authentication.
 
-### 6. Exception Handling
-- Centralized exception handling.
-- Resource not found handling.
-- Duplicate resource handling.
-- Validation error handling.
-- Meaningful API error responses.
+## Technology Stack
 
-## User Roles
+| Technology      | Usage                             |
+| --------------- | --------------------------------- |
+| Java 17         | Application development           |
+| Spring Boot 4   | Backend development               |
+| Spring Security | Authentication and authorization  |
+| Spring Data JPA | Database interaction              |
+| Hibernate       | Object-relational mapping         |
+| MySQL           | Database management               |
+| Java Swing      | Desktop GUI                       |
+| REST API        | Client-server communication       |
+| Maven           | Project and dependency management |
+| Jackson         | JSON processing                   |
+| Eclipse IDE     | Development environment           |
+| Postman         | API testing                       |
 
-| Role | Permissions |
-|---|---|
-| USER | Create tickets, view own tickets, and add comments. |
-| AGENT | View and manage tickets, update status and priority, and access user management APIs. |
+## System Architecture
 
-## Ticket Status Flow
+The application follows a three-layer backend architecture with a desktop client.
 
-Tickets follow this status flow:
+```text
+       JAVA SWING DESKTOP CLIENT
+                  |
+                  |
+              REST APIs
+                  |
+                  v
+        SPRING BOOT BACKEND
+                  |
+        ---------------------
+        |         |         |
+    Controller  Service  Security
+        |         |         |
+        ---------------------
+                  |
+                  v
+             Repository
+                  |
+                  v
+              MYSQL DB
+```
 
-`OPEN → IN_PROGRESS → CLOSED`
+### Working Process
 
-Invalid status transitions are rejected.
+1. Users interact with the Java Swing desktop application.
+2. The desktop client sends HTTP requests to the Spring Boot backend.
+3. Spring Security verifies authentication and authorization.
+4. Controllers receive and process API requests.
+5. Service classes handle business logic and validations.
+6. Repository interfaces perform database operations.
+7. MySQL stores application information.
+8. The backend returns JSON responses to the Swing client.
 
 ## Project Structure
 
 ```text
 helpdesk/
 │
-├── src/main/java/com/nexora/helpdesk/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/nexora/helpdesk/
+│   │   │
+│   │   │       ├── HelpdeskApplication.java
+│   │   │
+│   │   │       ├── controller/
+│   │   │       ├── dto/
+│   │   │       ├── entity/
+│   │   │       ├── enums/
+│   │   │       ├── exception/
+│   │   │       ├── repository/
+│   │   │       ├── security/
+│   │   │       ├── service/
+│   │   │
+│   │   │       └── desktop/
+│   │   │           ├── Main.java
+│   │   │           ├── api/
+│   │   │           ├── model/
+│   │   │           ├── ui/
+│   │   │           └── util/
+│   │   │
+│   │   └── resources/
+│   │       └── application.properties
 │   │
-│   ├── controller/
-│   ├── service/
-│   ├── repository/
-│   ├── entity/
-│   ├── dto/
-│   ├── enums/
-│   ├── security/
-│   └── exception/
+│   └── test/
 │
-├── src/main/resources/
-│   └── application.properties
-│
-├── src/test/
-│
+├── .gitignore
 ├── pom.xml
 └── README.md
 ```
 
+### Package Responsibilities
+
+| Package       | Description                                      |
+| ------------- | ------------------------------------------------ |
+| controller    | Handles REST API requests                        |
+| dto           | Request and response data objects                |
+| entity        | Database entity classes                          |
+| enums         | User roles, ticket priorities and statuses       |
+| exception     | Custom exceptions and global exception handling  |
+| repository    | Database access interfaces                       |
+| security      | Spring Security configuration and authentication |
+| service       | Business logic and validation                    |
+| desktop.api   | REST API communication                           |
+| desktop.model | Desktop application models                       |
+| desktop.ui    | Java Swing screens                               |
+| desktop.util  | Session and utility management                   |
+
 ## Database Configuration
 
-The application uses MySQL.
+The application uses MySQL as its relational database.
 
-### Step 1: Create Database
+### 1. Create Database
+
+Execute the following SQL command:
 
 ```sql
 CREATE DATABASE helpdesk_db;
 ```
 
-### Step 2: Configure application.properties
+### 2. Configure Database Connection
 
-Update your database configuration in:
-
-`src/main/resources/application.properties`
+Update `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/helpdesk_db
-spring.datasource.username=root
-spring.datasource.password=YOUR_MYSQL_PASSWORD
+spring.application.name=HelpDeskSupportSystem
 
+spring.datasource.url=jdbc:mysql://localhost:3306/helpdesk_db
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+spring.jpa.show-sql=false
 ```
 
-Replace `YOUR_MYSQL_PASSWORD` with your local MySQL password.
+Configure `DB_USERNAME` and `DB_PASSWORD` as environment variables.
 
-## How to Run the Project
+**Security note:** Never upload database passwords or private credentials to GitHub.
+
+## Installation and Setup
 
 ### Prerequisites
 
-- Java 17
+- Java JDK 17
+- Eclipse IDE
 - MySQL Server
 - Maven
-- Eclipse IDE or another Java IDE
-- Postman
+- Postman (optional, for API testing)
 
-### Steps
-
-1. Clone the repository:
+### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Nandini-Mali/HelpDesk_Support_Tickets_Application.git
+git clone YOUR_REPOSITORY_URL
 ```
 
-2. Open the project in Eclipse as an existing Maven project.
+### Step 2: Import Project into Eclipse
 
-3. Create the MySQL database:
+1. Open Eclipse IDE.
+2. Select File → Import.
+3. Choose Existing Maven Projects.
+4. Browse to the project directory.
+5. Finish the import.
 
-```sql
-CREATE DATABASE helpdesk_db;
-```
+### Step 3: Configure MySQL
 
-4. Configure your MySQL username and password in `application.properties`.
+1. Start MySQL Server.
+2. Create the `helpdesk_db` database.
+3. Configure database environment variables.
+4. Verify the database connection.
 
-5. Update Maven dependencies.
+### Step 4: Start Backend
 
-6. Run the main application class:
+Run the following class:
 
 `HelpdeskApplication.java`
 
-7. The application will start at:
+The backend starts at:
 
 `http://localhost:8080`
 
-## API Endpoints
+### Step 5: Start Desktop Application
 
-The following is the planned/current API endpoint reference. Confirm each mapping against the controller before using it.
+Run:
 
-### Authentication APIs
+`com.nexora.helpdesk.desktop.Main`
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and verify credentials |
+Ensure that the Spring Boot backend is running before starting the Swing application.
 
-### User APIs
+## REST API Modules
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/users` | Get all users |
-| GET | `/api/users/{id}` | Get user by ID |
-| GET | `/api/users/email/{email}` | Get user by email |
-| PUT | `/api/users/{id}` | Update user |
-| DELETE | `/api/users/{id}` | Soft delete user |
+The backend provides REST APIs for the following modules:
 
-### Ticket APIs
+| Module            | Endpoint                                | HTTP Method        |
+| ----------------- | --------------------------------------- | ------------------ |
+| Authentication    | `/api/auth/register`                    | POST               |
+| Authentication    | `/api/auth/login`                       | POST               |
+| User Management   | `/api/users/**`                         | GET / PUT / DELETE |
+| Ticket Management | `/api/tickets`                          | GET / POST         |
+| Ticket Details    | `/api/tickets/{ticketId}`               | GET                |
+| Ticket Status     | `/api/tickets/{ticketId}/status`        | PUT                |
+| Ticket Priority   | `/api/tickets/{ticketId}/priority`      | PUT                |
+| Comments          | `/api/comments/ticket/{ticketId}`       | GET / POST         |
+| Comments          | `/api/comments/{commentId}`             | GET / DELETE       |
+| Ticket History    | `/api/ticket-history/ticket/{ticketId}` | GET                |
+| Ticket History    | `/api/ticket-history/{historyId}`       | GET                |
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/tickets` | Create a ticket |
-| GET | `/api/tickets` | Get tickets |
-| GET | `/api/tickets/{ticketId}` | Get ticket by ID |
-| GET | `/api/tickets/user/{userId}` | Get tickets by user |
-| PUT | `/api/tickets/{ticketId}/status` | Update ticket status |
-| PUT | `/api/tickets/{ticketId}/priority` | Update ticket priority |
-| GET | `/api/tickets/status/{status}` | Filter tickets by status |
-| GET | `/api/tickets/priority/{priority}` | Filter tickets by priority |
+Protected endpoints require HTTP Basic authentication. Actual access also depends on the user's role and resource ownership.
 
-### Comment APIs
+## User Roles and Permissions
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/comments/ticket/{ticketId}/user/{userId}` | Add comment |
-| GET | `/api/comments/ticket/{ticketId}` | Get ticket comments |
-| GET | `/api/comments/{commentId}` | Get comment by ID |
-| DELETE | `/api/comments/{commentId}/user/{userId}` | Delete comment |
+### USER
 
-### Ticket History APIs
+- Register and log in.
+- Create support tickets.
+- View personal tickets.
+- Add comments to accessible tickets.
+- View accessible ticket history.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/ticket-history/ticket/{ticketId}/user/{userId}` | Get ticket history |
-| GET | `/api/ticket-history/{historyId}/user/{userId}` | Get history by ID |
+### AGENT
 
-## Authentication and API Testing
+- View tickets from different users.
+- Update ticket status.
+- Update ticket priority.
+- Access user and ticket information according to permissions.
+- Manage comments according to authorization rules.
 
-Use Postman to test REST API endpoints.
+## Ticket Status Workflow
 
-For protected APIs:
+```text
+       OPEN
+         |
+         v
+    IN_PROGRESS
+         |
+         v
+      CLOSED
+```
 
-1. Open the Authorization tab in Postman.
-2. Select Basic Auth.
-3. Enter the registered user's email as the username.
-4. Enter the original registered password.
-5. Send the API request.
-
-The application uses BCrypt to store encoded passwords in the database.
+The backend validates status transitions before saving changes.
 
 ## Testing
 
-API testing is being performed using Postman.
+The application can be tested using Postman and the Java Swing desktop client.
 
-Testing includes:
+Important test cases include:
 
 - User registration and login.
-- Duplicate email validation.
-- User management APIs.
+- Invalid login credentials.
+- Unauthorized API access.
+- USER and AGENT permissions.
 - Ticket creation and retrieval.
+- Ticket ownership validation.
 - Ticket status and priority updates.
-- Comment APIs.
-- Ticket history APIs.
-- Authentication and role-based authorization.
-- Exception handling and validation.
+- Comment operations.
+- Ticket history retrieval.
+- Logout and session management.
+- Database connectivity.
+
+A separate testing report will document test cases, actual results, and bugs fixed.
+
+## Application Screenshots
+
+Create a `screenshots` folder in the project and add actual screenshots of the desktop application.
+
+Suggested screenshots:
+
+1. Login Screen
+2. Registration Screen
+3. User Dashboard
+4. Create Ticket Screen
+5. Ticket List Screen
+6. Ticket Details Screen
+7. Agent Dashboard
+8. Ticket History Screen
 
 ## Future Enhancements
 
-- Complete API testing.
-- Add JUnit 5 test cases.
-- Improve authentication using JWT.
-- Implement average ticket closing time reports.
-- Improve filtering and pagination.
-- Prepare a Postman collection.
-- Add an Entity Relationship Diagram (ER Diagram).
+- Ticket assignment to support agents.
+- Email notifications.
+- Advanced ticket search.
+- Improved reporting and analytics.
+- Additional automated tests.
+- Enhanced desktop user experience.
 
-## Developer
+## Developer Information
 
-**Nandini Mali**
+**Developer:** Nandini Mali
+**Project Name:** HelpDesk Support Ticket System
+**Project Type:** Java Desktop Application with REST API Backend
 
-GitHub: https://github.com/Nandini-Mali
+**Technologies:** Java, Spring Boot, Spring Security, Java Swing, MySQL, Spring Data JPA, Hibernate, Maven and REST APIs.
 
-## Project Status
+---
 
-Backend development and security configuration are implemented. REST API testing and final verification are in progress.
+*Developed as part of practical Java development experience, focusing on desktop application development, backend integration, database management, and application security.*
+
