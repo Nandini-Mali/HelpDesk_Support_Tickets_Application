@@ -1,3 +1,4 @@
+
 package com.nexora.helpdesk.controller;
 
 import java.util.List;
@@ -6,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,62 +29,107 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/tickets")
 public class TicketController {
 
-	private final TicketService ticketService;
-	public TicketController(TicketService ticketService) {
-		this.ticketService=ticketService;
-	}
-//create new ticket
-  @PostMapping
-  public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request,@RequestParam Long userId){
-		TicketResponse response=ticketService.createTicket(request, userId);
-		return new ResponseEntity<>(response,HttpStatus.CREATED);
-	}
+    private final TicketService ticketService;
 
-//Get all tickets with pagination
-  @GetMapping
-  public ResponseEntity<Page<TicketResponse>> getAllTickets(Pageable pageable,@RequestParam Long userId){
-	Page<TicketResponse> tickets=ticketService.getAllTickets(pageable, userId);
-	return ResponseEntity.ok(tickets);
-}
-//Get ticket by ID
-  @GetMapping("/{ticketId}")
-  public ResponseEntity<TicketResponse> getTicketById(@PathVariable Long ticketId, @RequestParam Long userId) {
-    TicketResponse response=ticketService.getTicketById(ticketId, userId);
-    return ResponseEntity.ok(response);
-}
-//Get tickets by user
-  @GetMapping("/user/{targetUserId}")
-  public ResponseEntity<List<TicketResponse>> getTicketsByUser(@PathVariable Long targetUserId,@RequestParam Long requesterId) {
-    List<TicketResponse> tickets=ticketService.getTicketsByUser(targetUserId, requesterId);
-    return ResponseEntity.ok(tickets);
-}
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
 
-//Update ticket status
-  @PutMapping("/{ticketId}/status")
-  public ResponseEntity<TicketResponse> updateTicketStatus(@PathVariable Long ticketId,@RequestParam TicketStatus status,@RequestParam Long userId) {
-	  TicketResponse response=ticketService.updateTicketStatus(ticketId, status, userId);
-      return ResponseEntity.ok(response);
-}
+    // Create new ticket
+    @PostMapping
+    public ResponseEntity<TicketResponse> createTicket(
+            @Valid @RequestBody TicketRequest request,
+            Authentication authentication) {
 
-//Update ticket priority
-  @PutMapping("/{ticketId}/priority")
-  public ResponseEntity<TicketResponse> updateTicketPriority(@PathVariable Long ticketId,@RequestParam Priority priority,@RequestParam Long userId) {
-     TicketResponse response=ticketService.updateTicketPriority(ticketId, priority, userId);
-     return ResponseEntity.ok(response);
-}
+        TicketResponse response = ticketService.createTicket(
+                request, authentication.getName());
 
-//Filter tickets by status
-  @GetMapping("/status/{status}")
-  public ResponseEntity<List<TicketResponse>> getTicketsByStatus(@PathVariable TicketStatus status,@RequestParam Long userId) {
-     List<TicketResponse> tickets=ticketService.getTicketsByStatus(status, userId);
-     return ResponseEntity.ok(tickets);
-}
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
-//Filter tickets by priority
-  @GetMapping("/priority/{priority}")
-  public ResponseEntity<List<TicketResponse>> getTicketsByPriority(@PathVariable Priority priority,@RequestParam Long userId) {
-    List<TicketResponse> tickets =ticketService.getTicketsByPriority(priority, userId);
-    return ResponseEntity.ok(tickets);
-}
+    // Get all tickets with pagination
+    @GetMapping
+    public ResponseEntity<Page<TicketResponse>> getAllTickets(
+            Pageable pageable,
+            Authentication authentication) {
 
+        Page<TicketResponse> tickets =
+                ticketService.getAllTickets(pageable, authentication.getName());
+
+        return ResponseEntity.ok(tickets);
+    }
+
+    // Get ticket by ID
+    @GetMapping("/{ticketId}")
+    public ResponseEntity<TicketResponse> getTicketById(
+            @PathVariable Long ticketId,
+            Authentication authentication) {
+
+        TicketResponse response = ticketService.getTicketById(
+                ticketId, authentication.getName());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Get tickets created by a particular user
+    @GetMapping("/user/{targetUserId}")
+    public ResponseEntity<List<TicketResponse>> getTicketsByUser(
+            @PathVariable Long targetUserId,
+            Authentication authentication) {
+
+        List<TicketResponse> tickets = ticketService.getTicketsByUser(
+                targetUserId, authentication.getName());
+
+        return ResponseEntity.ok(tickets);
+    }
+
+    // Update ticket status
+    @PutMapping("/{ticketId}/status")
+    public ResponseEntity<TicketResponse> updateTicketStatus(
+            @PathVariable Long ticketId,
+            @RequestParam TicketStatus status,
+            Authentication authentication) {
+
+        TicketResponse response = ticketService.updateTicketStatus(
+                ticketId, status, authentication.getName());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Update ticket priority
+    @PutMapping("/{ticketId}/priority")
+    public ResponseEntity<TicketResponse> updateTicketPriority(
+            @PathVariable Long ticketId,
+            @RequestParam Priority priority,
+            Authentication authentication) {
+
+        TicketResponse response = ticketService.updateTicketPriority(
+                ticketId, priority, authentication.getName());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Filter tickets by status
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<TicketResponse>> getTicketsByStatus(
+            @PathVariable TicketStatus status,
+            Authentication authentication) {
+
+        List<TicketResponse> tickets = ticketService.getTicketsByStatus(
+                status, authentication.getName());
+
+        return ResponseEntity.ok(tickets);
+    }
+
+    // Filter tickets by priority
+    @GetMapping("/priority/{priority}")
+    public ResponseEntity<List<TicketResponse>> getTicketsByPriority(
+            @PathVariable Priority priority,
+            Authentication authentication) {
+
+        List<TicketResponse> tickets = ticketService.getTicketsByPriority(
+                priority, authentication.getName());
+
+        return ResponseEntity.ok(tickets);
+    }
 }

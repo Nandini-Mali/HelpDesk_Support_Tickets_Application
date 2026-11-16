@@ -1,3 +1,4 @@
+
 package com.nexora.helpdesk.security;
 
 import org.springframework.context.annotation.Bean;
@@ -20,16 +21,17 @@ public class SecurityConfig {
 
     public SecurityConfig(
             CustomUserDetailsService customUserDetailsService) {
+
         this.customUserDetailsService = customUserDetailsService;
     }
 
-// Password Encoder
+    // Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-// Authentication Provider
+    // Authentication Provider
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
 
@@ -41,86 +43,82 @@ public class SecurityConfig {
         return authProvider;
     }
 
- // Security Configuration
+    // Security Configuration
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
         http
+            // Disable CSRF for stateless REST APIs
             .csrf(csrf -> csrf.disable())
 
+            // Authentication provider
             .authenticationProvider(authenticationProvider())
 
+            // HTTP Basic Authentication
             .httpBasic(basic -> basic
                 .authenticationEntryPoint((request, response, ex) -> {
                     response.setStatus(
                             HttpStatus.UNAUTHORIZED.value());
+
                     response.setContentType("application/json");
+
                     response.getWriter().write(
                         "{\"status\":401,\"error\":\"Unauthorized\","
                         + "\"message\":\"Authentication required\"}");
                 })
             )
 
+            // Stateless session management
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS
                 )
             )
 
+            // Authorization rules
             .authorizeHttpRequests(auth -> auth
 
-            		.requestMatchers(
-            			    "/",
-            			    "/index.html",
-            			    "/register.html",
-            			    "/user-dashboard.html",
-            			    "/agent-dashboard.html",
-            			    "/create-ticket.html",
-            			    "/my-tickets.html",
-            			    "/ticket-details.html",
-            			    "/css/**",
-            			    "/js/**"
-            			).permitAll()
-                
-            		// Public APIs
+                // Public APIs
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/auth/register",
                     "/api/auth/login"
                 ).permitAll()
 
-                // User Management - AGENT
+                // User management - AGENT only
                 .requestMatchers("/api/users/**")
                     .hasRole("AGENT")
 
-                // Ticket Creation
+                // Ticket creation
                 .requestMatchers(HttpMethod.POST, "/api/tickets")
                     .hasAnyRole("USER", "AGENT")
 
-                // Ticket Reading
+                // Ticket reading
                 .requestMatchers(HttpMethod.GET, "/api/tickets/**")
                     .hasAnyRole("USER", "AGENT")
 
-                // Ticket Status Update
+                // Ticket status update - AGENT only
                 .requestMatchers(
-                    HttpMethod.PUT, "/api/tickets/*/status")
-                    .hasRole("AGENT")
+                    HttpMethod.PUT,
+                    "/api/tickets/*/status"
+                ).hasRole("AGENT")
 
-                // Ticket Priority Update
+                // Ticket priority update - AGENT only
                 .requestMatchers(
-                    HttpMethod.PUT, "/api/tickets/*/priority")
-                    .hasRole("AGENT")
+                    HttpMethod.PUT,
+                    "/api/tickets/*/priority"
+                ).hasRole("AGENT")
 
                 // Comments
                 .requestMatchers("/api/comments/**")
-                .hasAnyRole("USER", "AGENT")
+                    .hasAnyRole("USER", "AGENT")
 
-                // Ticket History
+                // Ticket history
                 .requestMatchers("/api/ticket-history/**")
                     .hasAnyRole("USER", "AGENT")
 
-                // Remaining APIs
+                // All remaining APIs require authentication
                 .anyRequest().authenticated()
             );
 

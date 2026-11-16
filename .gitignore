@@ -31,3 +31,24 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Eclipse workspace metadata ###
+.metadata/
+
+### Secret files ###
+.env
+.env.*
+secrets.properties
+application-local.properties
+
+### Log files ###
+*.log
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp

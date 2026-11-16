@@ -6,7 +6,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,7 @@ public class ApiClient {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    // Create authenticated request
     private HttpRequest.Builder request(String path) {
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
@@ -40,7 +40,8 @@ public class ApiClient {
             String credentials = email + ":" + new String(password);
 
             String encoded = Base64.getEncoder()
-                    .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+                    .encodeToString(
+                            credentials.getBytes(StandardCharsets.UTF_8));
 
             builder.header("Authorization", "Basic " + encoded);
 
@@ -50,6 +51,7 @@ public class ApiClient {
         return builder;
     }
 
+    // Send HTTP request
     private JsonNode send(HttpRequest request) throws Exception {
 
         HttpResponse<String> response = client.send(
@@ -74,7 +76,6 @@ public class ApiClient {
     }
 
     // LOGIN
-
     public UserSession login(String email, char[] password)
             throws Exception {
 
@@ -101,13 +102,10 @@ public class ApiClient {
     }
 
     // GET TICKETS
-
     public List<Ticket> getTickets() throws Exception {
 
-        long userId = SessionManager.getUser().getId();
-
         JsonNode response = send(
-                request("/api/tickets?userId=" + userId)
+                request("/api/tickets")
                         .GET()
                         .build()
         );
@@ -132,13 +130,10 @@ public class ApiClient {
     }
 
     // GET TICKET DETAILS
-
     public Ticket getTicket(long ticketId) throws Exception {
 
-        long userId = SessionManager.getUser().getId();
-
         JsonNode response = send(
-                request("/api/tickets/" + ticketId + "?userId=" + userId)
+                request("/api/tickets/" + ticketId)
                         .GET()
                         .build()
         );
@@ -147,14 +142,11 @@ public class ApiClient {
     }
 
     // CREATE TICKET
-
     public Ticket createTicket(
             String title,
             String description,
             String category,
             String priority) throws Exception {
-
-        long userId = SessionManager.getUser().getId();
 
         ObjectNode body = mapper.createObjectNode();
 
@@ -163,29 +155,23 @@ public class ApiClient {
         body.put("category", category);
         body.put("priority", priority);
 
-        HttpRequest request = request(
-                "/api/tickets?userId=" + userId
-        )
-        .POST(HttpRequest.BodyPublishers.ofString(
-                mapper.writeValueAsString(body)))
-        .build();
+        HttpRequest request = request("/api/tickets")
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        mapper.writeValueAsString(body)))
+                .build();
 
         JsonNode response = send(request);
 
         return mapper.treeToValue(response, Ticket.class);
     }
 
-    // UPDATE STATUS
-
+    // UPDATE STATUS - AGENT ONLY
     public Ticket updateStatus(long ticketId, String status)
             throws Exception {
-
-        long userId = SessionManager.getUser().getId();
 
         HttpRequest request = request(
                 "/api/tickets/" + ticketId
                 + "/status?status=" + status
-                + "&userId=" + userId
         )
         .PUT(HttpRequest.BodyPublishers.noBody())
         .build();
@@ -193,17 +179,13 @@ public class ApiClient {
         return mapper.treeToValue(send(request), Ticket.class);
     }
 
-    // UPDATE PRIORITY
-
+    // UPDATE PRIORITY - AGENT ONLY
     public Ticket updatePriority(long ticketId, String priority)
             throws Exception {
-
-        long userId = SessionManager.getUser().getId();
 
         HttpRequest request = request(
                 "/api/tickets/" + ticketId
                 + "/priority?priority=" + priority
-                + "&userId=" + userId
         )
         .PUT(HttpRequest.BodyPublishers.noBody())
         .build();
@@ -212,28 +194,38 @@ public class ApiClient {
     }
 
     // GET COMMENTS
-
     public String getComments(long ticketId) throws Exception {
 
-        long userId = SessionManager.getUser().getId();
-
         return send(
-                request("/api/comments/ticket/" + ticketId
-                        + "?userId=" + userId)
+                request("/api/comments/ticket/" + ticketId)
                         .GET()
                         .build()
         ).toPrettyString();
     }
 
-    // GET TICKET HISTORY
+    // ADD COMMENT - USER AND AGENT
+    public String addComment(long ticketId, String message)
+            throws Exception {
 
+        ObjectNode body = mapper.createObjectNode();
+
+        body.put("message", message);
+
+        HttpRequest request = request(
+                "/api/comments/ticket/" + ticketId
+        )
+        .POST(HttpRequest.BodyPublishers.ofString(
+                mapper.writeValueAsString(body)))
+        .build();
+
+        return send(request).toPrettyString();
+    }
+
+    // GET TICKET HISTORY
     public String getHistory(long ticketId) throws Exception {
 
-        long userId = SessionManager.getUser().getId();
-
         return send(
-                request("/api/ticket-history/ticket/" + ticketId
-                        + "?userId=" + userId)
+                request("/api/ticket-history/ticket/" + ticketId)
                         .GET()
                         .build()
         ).toPrettyString();

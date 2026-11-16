@@ -1,3 +1,4 @@
+
 package com.nexora.helpdesk.service;
 
 import java.util.List;
@@ -20,74 +21,103 @@ import com.nexora.helpdesk.repository.UserRepository;
 @Service
 @Transactional
 public class TicketHistoryService {
-	private final TicketHistoryRepository ticketHistoryRepository;
+
+    private final TicketHistoryRepository ticketHistoryRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
-    
-    public TicketHistoryService(TicketHistoryRepository ticketHistoryRepository,TicketRepository ticketRepository,UserRepository userRepository) {
-    	this.ticketHistoryRepository = ticketHistoryRepository;
+
+    public TicketHistoryService(
+            TicketHistoryRepository ticketHistoryRepository,
+            TicketRepository ticketRepository,
+            UserRepository userRepository) {
+
+        this.ticketHistoryRepository = ticketHistoryRepository;
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
     }
-//Get all history by Ticket ID
-    @Transactional(readOnly = true)
-    public List<TicketHistoryResponse> getHistoryByTicketId(Long ticketId, Long userId) {
-    	 User user = getActiveUserById(userId);
 
-         Ticket ticket = findTicketById(ticketId);
+    // Get all history by Ticket ID
+    @Transactional(readOnly = true)
+    public List<TicketHistoryResponse> getHistoryByTicketId(
+            Long ticketId, String authenticatedEmail) {
+
+        User user = getActiveUserByEmail(authenticatedEmail);
+
+        Ticket ticket = findTicketById(ticketId);
+
         checkHistoryAccess(ticket, user);
 
-        return ticketHistoryRepository.findByTicketIdOrderByChangedAtDesc(ticketId)
-                .stream().map(this::convertToResponse).collect(Collectors.toList());
+        return ticketHistoryRepository
+                .findByTicketIdOrderByChangedAtDesc(ticketId)
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
-//Get particular history by ID
+
+    // Get particular history by ID
     @Transactional(readOnly = true)
-    public TicketHistoryResponse getHistoryById(Long historyId, Long userId) {
-    	 User user = getActiveUserById(userId);
+    public TicketHistoryResponse getHistoryById(
+            Long historyId, String authenticatedEmail) {
 
-         TicketHistory history = findHistoryById(historyId);
+        User user = getActiveUserByEmail(authenticatedEmail);
 
-         checkHistoryAccess(history.getTicket(), user);
+        TicketHistory history = findHistoryById(historyId);
+
+        checkHistoryAccess(history.getTicket(), user);
 
         return convertToResponse(history);
     }
-    
- // Find active user by ID
-    private User getActiveUserById(Long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->new ResourceNotFoundException("User not found with ID: " + userId));
+    // Find active user by authenticated email
+    private User getActiveUserByEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with email: " + email));
 
         if (!user.isActive()) {
-            throw new ResourceNotFoundException("User is inactive");
+            throw new AccessDeniedException(
+                    "User account is inactive");
         }
 
         return user;
     }
- // Find ticket by ID
+
+    // Find ticket by ID
     private Ticket findTicketById(Long ticketId) {
 
         return ticketRepository.findById(ticketId)
-                .orElseThrow(() ->new ResourceNotFoundException("Ticket not found with ID: " + ticketId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Ticket not found with ID: " + ticketId));
     }
- // Find history by ID
+
+    // Find history by ID
     private TicketHistory findHistoryById(Long historyId) {
 
         return ticketHistoryRepository.findById(historyId)
-                .orElseThrow(() ->new ResourceNotFoundException("Ticket history not found with ID: " + historyId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Ticket history not found with ID: " + historyId));
     }
 
-  
+    // Check history access
     private void checkHistoryAccess(Ticket ticket, User user) {
-     
-    	boolean isOwner =ticket.getCreatedBy().getId().equals(user.getId());
-        boolean isAgent =user.getRole() == Role.AGENT;
+
+        boolean isOwner = ticket.getCreatedBy()
+                .getId().equals(user.getId());
+
+        boolean isAgent = user.getRole() == Role.AGENT;
+
         if (!isOwner && !isAgent) {
-            throw new AccessDeniedException("You are not allowed to access this ticket history");
+
+            throw new AccessDeniedException(
+                    "You are not allowed to access this ticket history");
         }
     }
-    
- // Convert Entity to Response DTO
+
+    // Convert Entity to Response DTO
     private TicketHistoryResponse convertToResponse(
             TicketHistory history) {
 
@@ -102,5 +132,3 @@ public class TicketHistoryService {
         );
     }
 }
-
-
