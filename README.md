@@ -336,8 +336,8 @@ Suggested screenshots:
 
 ## Developer Information
 
-**Developer:** Nandini Mali
-**Project Name:** HelpDesk Support Ticket System
+**Developer:** Nandini Mali 
+**Project Name:** HelpDesk Support Ticket System 
 **Project Type:** Java Desktop Application with REST API Backend
 
 **Technologies:** Java, Spring Boot, Spring Security, Java Swing, MySQL, Spring Data JPA, Hibernate, Maven and REST APIs.
